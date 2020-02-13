@@ -11,16 +11,28 @@ class Room:
     def item_action(self, action, item, player):
         if action == "drop" or action == "throw":
             if player.has_item(item):
-                player.items.remove(item)
-                self.items.append(item)
+                player.manage_items("remove", item)
+                self.manage_items("add", item)
 
                 print("item dropped")
         if action == "take" or action == "get":
-            if item in self.items:
-                player.items.append(item)
-                self.items.remove(item)
+            found = False
+            for local_item in self.items:
+                if item.name == local_item.name:
+                    found = True
+                    player.manage_items("add", item)
+                    self.manage_items("remove", item)
 
-                print("you have picked up " + item)
-            else:
-                print("item doesint exist")
+                    print(f"*** You Have Picked Up {item.name} ***")
 
+            if not found:
+                print("!!! Item Does Not Exist !!!")
+
+    def manage_items(self, type, item):
+        if type == "add":
+            self.items.append(item)
+        if type == "remove":
+            for i in range(len(self.items)):
+                if self.items[i].name == item.name:
+                    del self.items[i]
+                    break

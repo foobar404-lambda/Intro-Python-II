@@ -8,4 +8,17 @@ class Player:
         self.items = []
 
     def has_item(self, item):
-        return item in self.items
+        found = False
+        for local_item in self.items:
+            if local_item.name == item.name:
+                found = True
+        return found
+
+    def manage_items(self, type, item):
+        if type == "add":
+            self.items.append(item)
+        if type == "remove":
+            for i in range(len(self.items)):
+                if self.items[i].name == item.name:
+                    self.items.pop(i)
+                    break

@@ -1,37 +1,44 @@
 from room import Room
 from player import Player
+from item import Item
 
 # Declare all the rooms
 
+items = {
+    "rock": Item("rock", "its a rock"),
+    "candle": Item("candle", "its a candle"),
+    "grass": Item("grass", "its grass"),
+    "shoe": Item("shoe", "its a shoe"),
+    "gold": Item("gold", "its gold"),
+}
+
 rooms = {
     "outside": Room(
-        "Outside Cave Entrance",
-        "North of you, the cave mount beckons",
-        ["stick", "rock", "gun"],
+        "Outside Cave Entrance", "North of you, the cave mount beckons", [items["rock"]]
     ),
     "foyer": Room(
         "Foyer",
         """Dim light filters in from the south. Dusty passages run north and east.""",
-        ["chair", "rug", "candle"],
+        [items["candle"]],
     ),
     "overlook": Room(
         "Grand Overlook",
         """A steep cliff appears before you, falling
 into the darkness. Ahead to the north, a light flickers in
 the distance, but there is no way across the chasm.""",
-        ["grass"],
+        [items["rock"]],
     ),
     "narrow": Room(
         "Narrow Passage",
         """The narrow passage bends here from west
 to north. The smell of gold permeates the air.""",
-        ["bones", "shoe"],
+        [],
     ),
     "treasure": Room(
         "Treasure Chamber",
         """You've found the long-lost treasure
 chamber! Some valuables are spread accross the room. The only exit is to the south.""",
-        ["gold", "sword", "diamond"],
+        [items["gold"]],
     ),
 }
 
@@ -83,37 +90,43 @@ def parse(words):
 
 print(player.room.name)
 print(player.room.description)
-print("items:" + " ".join(player.room.items))
+print("items:" + " ".join(map(lambda x: x.name, player.room.items)))
+
+# main event loop
 
 while True:
 
-    msg = input("what now?\n").lower()
+    msg = input("??? What Now ??? \n").lower()
     if msg == "q":
         break
 
     words_type = parse(msg)
+    room_items = " ".join(map(lambda x: x.name, player.room.items))
+    player_items = " ".join(map(lambda x: x.name, player.items))
 
     if words_type == "direction":
 
         while not hasattr(player.room, f"{msg}_to") and msg != "q":
-            print("your path is blocked")
-            msg = input("what now?\n").lower()
+            print("!!! Your Path Is Blocked !!!")
+            msg = input("??? What Now ??? \n").lower()
 
         player.room = getattr(player.room, f"{msg}_to")
 
         print(player.room.name)
         print(player.room.description)
-        print("items:" + " ".join(player.room.items))
+        print("items:" + room_items)
 
     if words_type == "verb":
         action = msg.split(" ")[0]
-        item = " ".join(msg.split(" ")[1:])
+        item = items[" ".join(msg.split(" ")[1:]).strip()]
         player.room.item_action(action, item, player)
 
-        print("items:" + " ".join(player.room.items))
+        room_items = " ".join(map(lambda x: x.name, player.room.items))
+
+        print("ITEMS::" + room_items)
 
     if words_type == "inventory":
-        print(f"bag:{' '.join(player.items)}")
+        print(f"BAG::{player_items}")
 
 
 # If the user enters a cardinal direction, attempt to move to the room there.
